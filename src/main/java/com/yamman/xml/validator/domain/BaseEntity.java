@@ -1,0 +1,42 @@
+package com.yamman.xml.validator.domain;
+
+import lombok.Data;
+import org.hibernate.annotations.CreationTimestamp;
+import org.hibernate.annotations.UpdateTimestamp;
+
+import javax.persistence.*;
+import java.time.LocalDateTime;
+
+
+/**
+ *  The base entity .
+ *  The entity that all other entities in the application should extend from
+ */
+
+@MappedSuperclass
+@Data
+public abstract class BaseEntity {
+
+
+    /**
+     *  Id column
+     */
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long id;
+
+    /**
+     *  Creation date of record
+     */
+    @CreationTimestamp
+    @Column(name = "created")
+    private LocalDateTime created;
+
+    /**
+     *  Last modified date of record
+     */
+    @UpdateTimestamp
+    @Column(name = "last_modified")
+    private LocalDateTime changed;
+
+}
