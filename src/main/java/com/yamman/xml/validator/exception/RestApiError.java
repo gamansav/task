@@ -1,8 +1,6 @@
-package com.yamman.xml.validator.service.controller.exception;
+package com.yamman.xml.validator.exception;
 
-import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonProperty;
-import lombok.AllArgsConstructor;
 import lombok.Getter;
 
 import java.time.LocalDateTime;
