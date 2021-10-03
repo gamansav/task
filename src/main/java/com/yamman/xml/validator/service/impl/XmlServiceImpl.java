@@ -1,6 +1,5 @@
 package com.yamman.xml.validator.service.impl;
 
-import com.google.common.base.Optional;
 import com.yamman.xml.validator.dao.InvalidXmlRepository;
 import com.yamman.xml.validator.dao.ProceedXmlRepository;
 import com.yamman.xml.validator.dao.ValidXmlRepository;
@@ -10,25 +9,24 @@ import com.yamman.xml.validator.domain.ProceedXmlFile;
 import com.yamman.xml.validator.domain.ValidXmlEntity;
 import com.yamman.xml.validator.domain.XmlXsdEntity;
 import com.yamman.xml.validator.dto.XmlFileDto;
+import com.yamman.xml.validator.dto.XmlXsdDto;
 import com.yamman.xml.validator.enums.XmlFileState;
 import com.yamman.xml.validator.exception.FileNotFoundException;
 import com.yamman.xml.validator.form.GetXmlFileForm;
 import com.yamman.xml.validator.form.SaveXmlFileForm;
 import com.yamman.xml.validator.form.SaveXmlXsdLinkForm;
 import com.yamman.xml.validator.form.XmlValidateForm;
+import com.yamman.xml.validator.mapper.XmlXsdMapper;
 import com.yamman.xml.validator.service.XmlService;
 import com.yamman.xml.validator.service.XmlValidator;
 import com.yamman.xml.validator.utils.FileProvider;
 import com.yamman.xml.validator.exception.XmlValidationException;
 import lombok.RequiredArgsConstructor;
-import org.apache.tomcat.util.http.fileupload.FileUtils;
 import org.springframework.stereotype.Service;
-import org.springframework.util.FileCopyUtils;
 
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
-import java.nio.file.Path;
 import java.nio.file.Paths;
 
 
@@ -43,13 +41,15 @@ public class XmlServiceImpl implements XmlService {
     private final InvalidXmlRepository invalidXmlRepository;
     private final ProceedXmlRepository proceedXmlRepository;
 
+    private final XmlXsdMapper xmlXsdMapper;
+
     @Override
-    public void saveXmlXsdLink(SaveXmlXsdLinkForm saveXmlForm) {
-        xmlXsdRepository.save(XmlXsdEntity
+    public XmlXsdDto saveXmlXsdLink(SaveXmlXsdLinkForm saveXmlForm) {
+        return xmlXsdMapper.toDto(xmlXsdRepository.save(XmlXsdEntity
                 .builder()
                 .xmlFileName(saveXmlForm.getXsdFileName())
                 .xsdFileName(saveXmlForm.getXmlFileName())
-                .build());
+                .build()));
     }
 
 
@@ -62,10 +62,22 @@ public class XmlServiceImpl implements XmlService {
             throw new FileNotFoundException(xmlFileName);
         }
 
-        File xmlFile = fileProvider.getFileByName(xmlXsdEntity.getXmlFileName());
-        File xsdFile = fileProvider.getFileByName(xmlXsdEntity.getXsdFileName());
+        String xsdFileName = xmlXsdEntity.getXsdFileName();
+
+        File xmlFile = fileProvider.getFileByName(xmlFileName);
+        File xsdFile = fileProvider.getFileByName(xsdFileName);
         try {
             xmlValidator.validateXmlByXsd(xmlFile, xsdFile);
+            XmlXsdEntity xmlXsd = XmlXsdEntity
+                    .builder()
+                    .xsdFileName(xsdFileName)
+                    .xmlFileName(xmlFileName)
+                    .build();
+            xmlXsdRepository.save(xmlXsd);
+            validXmlRepository.save(ValidXmlEntity
+                    .builder()
+                    .xmlXsdEntity(xmlXsd)
+                    .build());
         } catch (XmlValidationException exception) {
             invalidXmlRepository.save(InvalidXmlEntity
                     .builder()
@@ -90,7 +102,6 @@ public class XmlServiceImpl implements XmlService {
                         .builder()
                         .xmlXsdEntity(xmlXsdEntity)
                         .build());
-//                return какое-нибудь сообщение DTO
             }
             InvalidXmlEntity invalidXmlEntity = invalidXmlRepository.findByXmlXsdEntity(xmlXsdEntity);
             if (invalidXmlEntity != null) {
