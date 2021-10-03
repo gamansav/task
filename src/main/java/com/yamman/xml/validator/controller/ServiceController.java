@@ -1,8 +1,7 @@
 package com.yamman.xml.validator.controller;
 
 
-import com.yamman.xml.validator.dto.SaveXmlDto;
-import com.yamman.xml.validator.form.SaveXmlForm;
+import com.yamman.xml.validator.form.SaveXmlXsdLinkForm;
 import com.yamman.xml.validator.service.XmlService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
@@ -30,8 +29,8 @@ public class ServiceController {
 
 
     @PutMapping(SAVE_XSD_URL)
-    public SaveXmlDto saveXsd(SaveXmlForm saveXmlForm) {
-        return xmlService.saveXmlXsdLink(saveXmlForm);
+    public void saveXsd(SaveXmlXsdLinkForm saveXmlXsdLinkForm) {
+        xmlService.saveXmlXsdLink(saveXmlXsdLinkForm);
     }
 
     @GetMapping(VALIDATE_XSD_URL)

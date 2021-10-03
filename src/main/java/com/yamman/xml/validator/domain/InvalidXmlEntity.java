@@ -5,22 +5,19 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-import javax.persistence.*;
+import javax.persistence.Entity;
+import javax.persistence.OneToOne;
+import javax.persistence.Table;
 
 @Entity
-@Data
 @Builder
+@Data
 @AllArgsConstructor
 @NoArgsConstructor
 @Table(name = "invalid")
-public class InvalidXmlEntity extends BaseEntity {
+public class InvalidXmlEntity extends BaseEntity{
 
-    @JoinColumn(name = "xml")
     @OneToOne
-    private XmlFileEntity xmlFileEntity;
-
-    @JoinColumn(name = "xsd")
-    @OneToOne
-    private XsdSchemaEntity xmlschemaEntity;
+    private XmlXsdEntity xmlXsdEntity;
 
 }

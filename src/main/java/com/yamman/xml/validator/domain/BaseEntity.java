@@ -17,24 +17,14 @@ import java.time.LocalDateTime;
 @Data
 public abstract class BaseEntity {
 
-
-    /**
-     *  Id column
-     */
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    /**
-     *  Creation date of record
-     */
     @CreationTimestamp
     @Column(name = "created")
     private LocalDateTime created;
 
-    /**
-     *  Last modified date of record
-     */
     @UpdateTimestamp
     @Column(name = "last_modified")
     private LocalDateTime changed;
